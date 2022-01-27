@@ -1,0 +1,44 @@
+{
+    "name": "api-skeletons/laravel-doctrine-hal",
+    "description": "Doctrine Metadata based HAL",
+    "type": "library",
+    "require": {
+        "php": "^8.0",
+        "laravel-doctrine/orm": "^1.6"
+    },
+    "require-dev": {
+        "doctrine/coding-standard": "^9.0",
+        "doctrine/dbal": "^3.1.1",
+        "doctrine/annotations": "^1.13.2",
+        "orchestra/testbench": "^6.23",
+        "phpunit/phpunit": "^9.5",
+        "vimeo/psalm": "^4.15"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ApiSkeletons\\Laravel\\Doctrine\\HAL\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ApiSkeletonsTest\\Laravel\\Doctrine\\HAL\\": "test/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Tom H Anderson",
+            "email": "tom.h.anderson@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ApiSkeletons\\Laravel\\Doctrine\\HAL\\ServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpcs && vendor/bin/phpunit && vendor/bin/psalm"
+    }
+}
