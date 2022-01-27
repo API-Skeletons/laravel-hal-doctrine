@@ -4,7 +4,8 @@
     "type": "library",
     "require": {
         "php": "^8.0",
-        "laravel-doctrine/orm": "^1.6"
+        "laravel-doctrine/orm": "^1.6",
+        "api-skeletons/laravel-hal": "^4.0"
     },
     "require-dev": {
         "doctrine/coding-standard": "^9.0",
