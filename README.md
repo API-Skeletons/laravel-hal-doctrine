@@ -33,3 +33,44 @@ will result in a HAL response like
   "id": 1,
   "name": "Legion of Mary"
 }
+
+
+## Configuration
+
+```php
+$config = [
+    'default' => [
+        'entityManager' => EntityManager::class,
+        'routePatterns' => [
+            'entity' => 'api.{name}::fetch',
+            'collection => 'api.{name}::fetchAll',
+        ],
+        'entities' => [
+            \App\ORM\Entity\Artist::class => [
+                // Override route patterns
+                'routes' => [
+                    'entity' => 'artist::fetch',
+                    'collection' => 'artist::fetchAll',
+                ],
+                // List of fields and assocations to exclude
+                'exclude' => [
+                    'alias',
+                ],
+            ],
+            /**
+             * Every entity which should be extracted, whether on
+             * its own or as a relationship, must be listed in the
+             * config even if its configuration is emtpy.  Entities 
+             * discovered in the metadata through relationships which
+             * are not in the configuration will be excluded.
+             */
+            \App\ORM\Entity\Album::class => [],
+        ],
+    ],
+];
+```
+
+## Naming strategies
+
+The naming strategy for turning an entity name into a HAL identifier is configurable and
+you can write your own naming strategy if desired.
