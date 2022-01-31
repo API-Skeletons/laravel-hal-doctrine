@@ -1,6 +1,6 @@
-# Laravel Doctrine HAL
+# Laravel HAL Doctrine
 
-This project is an adaptation of [laravel-hal](https://github.com/API-Skeletons/laravel-hal)
+This project is a hydrator for [laravel-hal](https://github.com/API-Skeletons/laravel-hal)
 for Doctrine.  Instead of manually creating every hydrator for your entities, this library
 will introspect an entity or collection and generate the HAL for it including links to 
 other collections for one to many relationships and embedding many to one and one to one
@@ -12,10 +12,32 @@ configure the routes for each entity.
 
 ## Use
 
+### Create a hydrator manager
+
 ```php
+namespace App\HAL;
+
+use ApiSkeletons\Laravel\HAL\HydratorManager as HALHydratorManager;
+
+final class HydratorManager extends HALHydratorManager
+{
+    public function __construct() 
+    {
+        $this->classHydrators = [
+            \App\ORM\Entity\Artist::class => \ApiSkeletons\Laravel\HAL\Doctrine\DoctrineHydrator::class,
+        ];
+    }
+}
+```
+
+### Extract an entity
+```php
+use App\Hal\HydratorManager;
+
 public function fetch(Entity\Artist $artist)
 {
-    return app('DoctrineHAL').extract($artist);
+    $hydratorManager = new HydratorManager();
+    return $hydratorManager->extract($artist);
 }
 ```
 

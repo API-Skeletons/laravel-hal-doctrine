@@ -1,6 +1,6 @@
 <?php
 
-namespace ApiSkeletons\Laravel\Doctrine\HAL;
+namespace ApiSkeletons\Laravel\HAL\Doctrine;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
@@ -8,45 +8,35 @@ use Illuminate\Foundation\Application;
 
 class DoctrineHydrator
 {
-    private Application $application;
-    private string $configurationSection = 'default';
-    private array $loadedConfiguration = [];
-    private EntityManager $entityManager;
+    protected string $configurationSection = 'default';
+    protected array $config = [];
+    protected EntityManager $entityManager;
 
     public function __construct(Application $application)
     {
-        $this->application = $application;
-    }
+        $this->config = $application->get('config')['hal-doctrine'];
 
-    /**
-     * @throws \Exception
-     */
-    public function config(string $section): self
-    {
-        if ($this->loadedConfiguration) {
-            throw new \Exception('Cannot set configuration section.  Configuration is already loaded.');
+        if (! isset($this->config['entityManager'])) {
+            throw new \Exception(
+                'Entity Manager configuration is missing for ' . $this->configurationSection
+            );
         }
-        $this->configurationSection = $section;
-
-        return $this;
+        $this->entityManager = $application->get($this->config['entityManager']);
     }
 
     public function extract(object $entity): array
     {
-        $this->validateEntity($entity);
+        $entityName = $this->validateEntity($entity);
+        $entityMetadata = $this->em->getMetadataFactory()
+            ->getMetadataFor($entityName);
+
+
 
         return [];
     }
 
-    protected function validateEntity(object $entity): self
+    protected function validateEntity(object $entity): string
     {
-        if (! isset($this->configuration()['entityManager'])) {
-            throw new \Exception('Entity Manager configuration is missing');
-        }
-
-        $this->entityManager = $this->application
-            ->get($this->configuration()['entityManager']);
-
         try {
             $entityName = $this->em->getMetadataFactory()
                 ->getMetadataFor(get_class($entity))->getName();
@@ -58,35 +48,6 @@ class DoctrineHydrator
             throw new \Exception('Entity is not mapped in the configuration');
         }
 
-        return $this;
-    }
-
-    private function configuration(): array
-    {
-        if (! $this->loadedConfiguration) {
-            $this->loadedConfiguration =
-                config('doctrine-hal.' . $this->configurationSection);
-        }
-
-        return $this->loadedConfiguration;
-    }
-
-    private function entityConfiguration(): array
-    {
-        if (! isset($this->configuration()['entities'])) {
-            throw new \Exception('entities section is missing from configuration');
-        }
-
-        return $this->configuration()['entities'];
-    }
-
-    private function hasConfig(string $entityName): bool
-    {
-        return isset($this->entityConfiguration()[$entityName]);
-    }
-
-    protected function extractEntity(object $entity)
-    {
-
+        return $entityName;
     }
 }

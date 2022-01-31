@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ApiSkeletons\Laravel\Doctrine\HAL;
+namespace ApiSkeletons\Laravel\HAL\Doctrine;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 

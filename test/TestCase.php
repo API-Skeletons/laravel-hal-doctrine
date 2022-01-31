@@ -1,9 +1,10 @@
 <?php
 
-namespace ApiSkeletonsTest\Laravel\Doctrine\HAL;
+namespace ApiSkeletonsTest\Laravel\HAL\Doctrine;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use LaravelDoctrine\ORM\DoctrineServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
@@ -11,16 +12,21 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app)
     {
         return [
-            \LaravelDoctrine\ORM\DoctrineServiceProvider::class,
-            \ApiSkeletons\Laravel\Doctrine\HAL\ServiceProvider::class,
+            DoctrineServiceProvider::class,
         ];
     }
 
     protected function getEnvironmentSetUp($app)
     {
         $app['config']['doctrine.managers.default.paths'] = [
-            __DIR__ . '/Entities'
+            __DIR__ . '/config'
         ];
+
+        $app['config']['doctrine.managers.default.namespaces'] = [
+            'ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity',
+        ];
+
+        $app['config']['doctrine.managers.default.meta'] = 'xml';
     }
 
     protected function createDatabase(EntityManager $entityManager): EntityManager
