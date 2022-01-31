@@ -1,5 +1,5 @@
 {
-    "name": "api-skeletons/laravel-doctrine-hal",
+    "name": "api-skeletons/laravel-hal-doctrine",
     "description": "Doctrine Metadata based HAL",
     "type": "library",
     "require": {
@@ -18,12 +18,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "ApiSkeletons\\Laravel\\Doctrine\\HAL\\": "src/"
+            "ApiSkeletons\\Laravel\\HAL\\Doctrine\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ApiSkeletonsTest\\Laravel\\Doctrine\\HAL\\": "test/"
+            "ApiSkeletonsTest\\Laravel\\HAL\\Doctrine\\": "test/"
         }
     },
     "authors": [
@@ -35,7 +35,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ApiSkeletons\\Laravel\\Doctrine\\HAL\\ServiceProvider"
+                "ApiSkeletons\\Laravel\\HAL\\Doctrine\\ServiceProvider"
             ]
         }
     },
