@@ -6,16 +6,22 @@ namespace ApiSkeletons\Laravel\HAL\Doctrine;
 
 use ApiSkeletons\Laravel\HAL\Hydrator;
 use ApiSkeletons\Laravel\HAL\Resource;
+use DateTime;
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\InflectorFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
 use Exception;
 use Illuminate\Foundation\Application;
+use ReflectionClass;
 
-use Illuminate\Support\Facades\Date;
 use function array_diff_key;
 use function array_flip;
+use function count;
+use function in_array;
+use function print_r;
+use function route;
+use function str_replace;
 
 class DoctrineHydrator extends Hydrator
 {
@@ -40,7 +46,7 @@ class DoctrineHydrator extends Hydrator
         }
 
         $this->entityManager = $application->get($this->config['entityManager']);
-        $this->inflector = InflectorFactory::create()->build();
+        $this->inflector     = InflectorFactory::create()->build();
     }
 
     public function extract(mixed $entity): Resource
@@ -70,9 +76,11 @@ class DoctrineHydrator extends Hydrator
 
         // Convert datetime objects to ISO 8601
         foreach ($state as $key => $value) {
-            if ($value instanceof \DateTime) {
-                $state[$key] = $value->format('c');
+            if (! ($value instanceof DateTime)) {
+                continue;
             }
+
+            $state[$key] = $value->format('c');
         }
 
         // Build resource and set state
@@ -90,27 +98,30 @@ class DoctrineHydrator extends Hydrator
             }
 
             if ($entityMetadata->isCollectionValuedAssociation($associationName)) {
-                $associationMapping = $entityMetadata->getAssociationMapping($associationName);
+                $associationMapping   = $entityMetadata->getAssociationMapping($associationName);
                 $associationRouteName = $this->getRouteName($associationMapping['targetEntity'], 'collection');
                 $resource->addLink(
                     $this->inflector->urlize($associationName),
-                    route($associationRouteName, ['filter' => [
-                        $associationMapping['mappedBy'] => $identifier,
-                    ]]));
+                    route($associationRouteName, [
+                        'filter' => [$associationMapping['mappedBy'] => $identifier],
+                    ])
+                );
             } else {
                 // For 1:1 relationships, only embed the owning side
                 // For the inverse side, include a link
                 if ($entityMetadata->isAssociationInverseSide($associationName)) {
                     $associationMapping = $entityMetadata->getAssociationMapping($associationName);
 
-                    print_r($associationMapping);die('1:1 inverse side not finished');
+                    print_r($associationMapping);
+                    die('1:1 inverse side not finished');
 
                     $associationRouteName = $this->getRouteName($associationMapping['targetEntity'], 'collection');
                     $resource->addLink(
                         $this->inflector->urlize($associationName),
-                        route($associationRouteName, ['filter' => [
-                            $associationMapping['mappedBy'] => $identifier,
-                        ]]));
+                        route($associationRouteName, [
+                            'filter' => [$associationMapping['mappedBy'] => $identifier],
+                        ])
+                    );
                 } else {
                     $resource->addEmbeddedResource(
                         $this->inflector->urlize($associationName),
@@ -128,7 +139,7 @@ class DoctrineHydrator extends Hydrator
         return $this->config['entities'][$entityName]['routeNames'][$routeType] ??
             str_replace(
                 '{entityName}',
-                $this->inflector->urlize((new \ReflectionClass($entityName))->getShortName()),
+                $this->inflector->urlize((new ReflectionClass($entityName))->getShortName()),
                 $this->config['routeNamePatterns'][$routeType]
             );
     }

@@ -65,8 +65,6 @@ final class DoctrineHydratorTest extends TestCase
             ->find(1);
         $hal = $this->hydratorManager->extract($artist)->toArray();
 
-        print_r($hal);die();
-
-        $this->assertEquals('http://localhost/artist/1', $hal['_links']['self']['href']);
+        $this->assertEquals('http://localhost/performance/1', $hal['_links']['self']['href']);
     }
 }
