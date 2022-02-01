@@ -2,6 +2,7 @@
 
 namespace ApiSkeletonsTest\Laravel\HAL\Doctrine;
 
+use Doctrine\Laminas\Hydrator\DoctrineObject;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use LaravelDoctrine\ORM\DoctrineServiceProvider;
@@ -27,10 +28,17 @@ abstract class TestCase extends OrchestraTestCase
         ];
 
         $app['config']['doctrine.managers.default.meta'] = 'xml';
+
+        $app['config']['hal-doctrine'] = include(__DIR__ . '/config/hal-doctrine.php');
+
+        $app['config']['doctrine.custom_hydration_modes'] = [
+            'hal-doctrine' => DoctrineObject::class,
+        ];
     }
 
-    protected function createDatabase(EntityManager $entityManager): EntityManager
+    protected function createDatabase(): EntityManager
     {
+        $entityManager = app('em');
         $tool = new SchemaTool($entityManager);
         $tool->createSchema($entityManager->getMetadataFactory()->getAllMetadata());
 
