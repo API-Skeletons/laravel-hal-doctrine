@@ -13,19 +13,16 @@ class ServiceProvider extends LaravelServiceProvider
      */
     public function register(): void
     {
-//        $this->app->singleton(ApiKeyService::class, static function ($app) {
-//            return new ApiKeyService();
-//        });
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap any package services.
      */
-    // phpcs:disable SlevomatCodingStandard.ControlStructures.EarlyExit.EarlyExitNotUsed
     public function boot(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([]);
-        }
+        $this->publishes([
+            __DIR__ . '/../config/hal-doctrine.php'
+                => config_path('hal-doctrine.php'),
+        ]);
     }
 }
