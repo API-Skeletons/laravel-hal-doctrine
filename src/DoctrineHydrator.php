@@ -6,6 +6,7 @@ namespace ApiSkeletons\Laravel\HAL\Doctrine;
 
 use ApiSkeletons\Laravel\HAL\Hydrator;
 use ApiSkeletons\Laravel\HAL\Resource;
+use Doctrine\Inflector\InflectorFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
 use Exception;
@@ -40,6 +41,8 @@ class DoctrineHydrator extends Hydrator
 
     public function extract(mixed $entity): Resource
     {
+        $inflector = InflectorFactory::create()->build();
+
         $state          = [];
         $entityName     = $this->validateEntity($entity);
         $entityMetadata = $this->entityManager->getMetadataFactory()
@@ -49,21 +52,32 @@ class DoctrineHydrator extends Hydrator
         $data = $this->entityManager->newHydrator('hal-doctrine')
             ->extract($entity);
 
+        // Find primary key
+        $identifier = $data[$entityMetadata->getIdentifier()[0]];
+
         // Copy fields from data to state
         foreach ($entityMetadata->getFieldNames() as $fieldName) {
             $state[$fieldName] = $data[$fieldName];
         }
 
         // Strip excluded fields
-        /**
-         * psalm:ignore MixedArrayAccess
-         */
         $exclude = $this->config['entities'][$entityName]['exclude'] ?? [];
         if ($exclude) {
             $state = array_diff_key($state, array_flip($exclude));
         }
 
-        return $this->hydratorManager->resource($state);
+        // Find route name for self link
+        $entityRouteName = $this->config['entities'][$entityName]['routeNames']['entity'] ??
+            str_replace(
+                '{entityName}',
+                $inflector->urlize((new \ReflectionClass($entity))->getShortName()),
+                $this->config['routeNamePatterns']['entity']
+            );
+
+        $resource = $this->hydratorManager->resource($state);
+        $resource->addLink('self', route($entityRouteName, $identifier));
+
+        return $resource;
     }
 
     /**
@@ -72,10 +86,17 @@ class DoctrineHydrator extends Hydrator
     protected function validateEntity(object $entity): string
     {
         try {
-            $entityName = $this->entityManager->getMetadataFactory()
-                ->getMetadataFor($entity::class)->getName();
+            $metadata = $this->entityManager->getMetadataFactory()
+                ->getMetadataFor($entity::class);
+
+            $entityName = $metadata->getName();
         } catch (MappingException $e) {
             throw new Exception('Object ' . $entity::class . ' is not a Doctrine entity.');
+        }
+
+        // Find primary key
+        if (count($metadata->getIdentifier()) > 1) {
+            throw new Exception('Multi-keyed entities are not supported.');
         }
 
         return $entityName;

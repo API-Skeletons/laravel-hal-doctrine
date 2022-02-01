@@ -30,7 +30,7 @@ final class DoctrineHydratorTest extends TestCase
         $this->assertEquals('Grateful Dead', $artist->getName());
     }
 
-    public function testHydratorExtractState(): void
+    public function testState(): void
     {
         $hydratorManager = new HydratorManager();
 
@@ -42,5 +42,21 @@ final class DoctrineHydratorTest extends TestCase
         $this->assertEquals(1, $hal['id']);
         $this->assertEquals('Grateful Dead', $hal['name']);
     }
+
+    public function testSelfLink(): void
+    {
+        $hydratorManager = new HydratorManager();
+
+        $artist = $this->entityManager->getRepository(Entity\Artist::class)
+            ->find(1);
+        $hal = $hydratorManager->extract($artist)->toArray();
+        $this->assertEquals('http://localhost/artist/1', $hal['_links']['self']['href']);
+
+        $artist = $this->entityManager->getRepository(Entity\Artist::class)
+            ->find(2);
+        $hal = $hydratorManager->extract($artist)->toArray();
+        $this->assertEquals('http://localhost/artist/2', $hal['_links']['self']['href']);
+    }
+
 
 }

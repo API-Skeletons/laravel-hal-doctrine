@@ -3,19 +3,23 @@
 return [
     'default' => [
         'entityManager' => \Doctrine\ORM\EntityManager::class,
-        'routePatterns' => [
-            'entity' => 'api.{name}::fetch',
-            'collection' => 'api.{name}::fetchAll',
+        'routeNamePatterns' => [
+            'entity' => 'api.{entityName}::fetch',
+            'collection' => 'api.{entityName}::fetchAll',
         ],
         'entities' => [
             \ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Artist::class => [
                 'exclude' => [
 //                    'name',
                 ],
+                'routesNames' => [
+                    'entity' => 'artist::fetch',
+                    'collection' => 'artist::fetchAll',
+                ],
             ],
             \ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Performance::class => [
                 // Override route patterns
-                'routes' => [
+                'routesNames' => [
                     'entity' => 'performance::fetch',
                     'collection' => 'performance::fetchAll',
                 ],
