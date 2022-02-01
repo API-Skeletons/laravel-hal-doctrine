@@ -5,11 +5,39 @@ namespace ApiSkeletonsTest\Laravel\HAL\Doctrine;
 use Doctrine\Laminas\Hydrator\DoctrineObject;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use Illuminate\Support\Facades\Route;
 use LaravelDoctrine\ORM\DoctrineServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Route::get('artist', function() {
+            return true;
+        })->name('api.artist::fetchAll');
+        Route::get('artist/{id}', function() {
+            return true;
+        })->name('api.artist::fetch');
+
+        Route::get('performance', function() {
+            return true;
+        })->name('api.performance::fetchAll');
+        Route::get('performance/{id}', function() {
+            return true;
+        })->name('api.performance::fetch');
+
+        Route::get('recording', function() {
+            return true;
+        })->name('api.recording::fetchAll');
+        Route::get('recording/{id}', function() {
+            return true;
+        })->name('api.recording::fetch');
+
+    }
+
     protected function getPackageProviders($app)
     {
         return [

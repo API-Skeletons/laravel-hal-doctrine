@@ -13,6 +13,7 @@ final class DoctrineHydratorTest extends TestCase
 {
     use PopulateData;
 
+    private HydratorManager $hydratorManager;
     private EntityManager $entityManager;
 
     public function setUp(): void
@@ -20,6 +21,7 @@ final class DoctrineHydratorTest extends TestCase
         parent::setUp();
         $this->entityManager = $this->createDatabase();
         $this->populateData();
+        $this->hydratorManager = new HydratorManager();
     }
 
     public function testPopulateData(): void
@@ -30,7 +32,7 @@ final class DoctrineHydratorTest extends TestCase
         $this->assertEquals('Grateful Dead', $artist->getName());
     }
 
-    public function testHydratorExtractState(): void
+    public function testTopEntityState(): void
     {
         $hydratorManager = new HydratorManager();
 
@@ -43,4 +45,26 @@ final class DoctrineHydratorTest extends TestCase
         $this->assertEquals('Grateful Dead', $hal['name']);
     }
 
+    public function testTopEntitySelfLink(): void
+    {
+        $artist = $this->entityManager->getRepository(Entity\Artist::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($artist)->toArray();
+        $this->assertEquals('http://localhost/artist/1', $hal['_links']['self']['href']);
+
+        $artist = $this->entityManager->getRepository(Entity\Artist::class)
+            ->find(2);
+        $hal = $this->hydratorManager->extract($artist)->toArray();
+        $this->assertEquals('http://localhost/artist/2', $hal['_links']['self']['href']);
+    }
+
+
+    public function testMidEntity(): void
+    {
+        $artist = $this->entityManager->getRepository(Entity\Performance::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($artist)->toArray();
+
+        $this->assertEquals('http://localhost/performance/1', $hal['_links']['self']['href']);
+    }
 }

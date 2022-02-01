@@ -53,7 +53,7 @@ will result in a HAL response like
     }
   },
   "id": 1,
-  "name": "Legion of Mary"
+  "name": "Grateful Dead"
 }
 ```
 
@@ -64,18 +64,18 @@ will result in a HAL response like
 $config = [
     'default' => [
         'entityManager' => EntityManager::class,
-        'routePatterns' => [
+        'routeNamePatterns' => [
             'entity' => 'api.{name}::fetch',
             'collection' => 'api.{name}::fetchAll',
         ],
         'entities' => [
             \App\ORM\Entity\Artist::class => [
                 // Override route patterns
-                'routes' => [
+                'routesNames' => [
                     'entity' => 'artist::fetch',
                     'collection' => 'artist::fetchAll',
                 ],
-                // List of fields and assocations to exclude
+                // List of fields and associations to exclude
                 'exclude' => [
                     'alias',
                 ],
