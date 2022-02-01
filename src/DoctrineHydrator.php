@@ -36,6 +36,7 @@ class DoctrineHydrator extends Hydrator
         if (! $application->get('config')['hal-doctrine']) {
             throw new Exception('hal-doctrine config is missing');
         }
+
         // @codeCoverageIgnoreEnd
 
         $this->config = $application->get('config')['hal-doctrine'][$this->configurationSection];
@@ -46,6 +47,7 @@ class DoctrineHydrator extends Hydrator
                 'Entity Manager configuration is missing for ' . $this->configurationSection
             );
         }
+
         // @codeCoverageIgnoreEnd
 
         $this->entityManager = $application->get($this->config['entityManager']);
@@ -171,6 +173,7 @@ class DoctrineHydrator extends Hydrator
         if (count($metadata->getIdentifier()) > 1) {
             throw new Exception('Multi-keyed entities are not supported.');
         }
+
         // @codeCoverageIgnoreEnd
 
         return $entityName;
