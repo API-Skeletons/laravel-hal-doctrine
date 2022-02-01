@@ -53,7 +53,7 @@ will result in a HAL response like
     }
   },
   "id": 1,
-  "name": "Legion of Mary"
+  "name": "Grateful Dead"
 }
 ```
 
