@@ -5,7 +5,7 @@
     "require": {
         "php": "^8.0",
         "laravel-doctrine/orm": "^1.7",
-        "api-skeletons/laravel-hal": "^5.0.1",
+        "api-skeletons/laravel-hal": "^5.0.2",
         "doctrine/doctrine-laminas-hydrator": "^2.2",
         "api-skeletons/doctrine-querybuilder-filter": "^1.2"
     },

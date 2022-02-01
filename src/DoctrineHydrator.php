@@ -32,17 +32,21 @@ class DoctrineHydrator extends Hydrator
 
     public function __construct(Application $application)
     {
+        // @codeCoverageIgnoreStart
         if (! $application->get('config')['hal-doctrine']) {
             throw new Exception('hal-doctrine config is missing');
         }
+        // @codeCoverageIgnoreEnd
 
         $this->config = $application->get('config')['hal-doctrine'][$this->configurationSection];
 
+        // @codeCoverageIgnoreStart
         if (! isset($this->config['entityManager'])) {
             throw new Exception(
                 'Entity Manager configuration is missing for ' . $this->configurationSection
             );
         }
+        // @codeCoverageIgnoreEnd
 
         $this->entityManager = $application->get($this->config['entityManager']);
         $this->inflector     = InflectorFactory::create()->build();
@@ -158,6 +162,7 @@ class DoctrineHydrator extends Hydrator
                 ->getMetadataFor($entity::class);
 
             $entityName = $metadata->getName();
+        // @codeCoverageIgnoreStart
         } catch (MappingException $e) {
             throw new Exception('Object ' . $entity::class . ' is not a Doctrine entity.');
         }
@@ -166,6 +171,7 @@ class DoctrineHydrator extends Hydrator
         if (count($metadata->getIdentifier()) > 1) {
             throw new Exception('Multi-keyed entities are not supported.');
         }
+        // @codeCoverageIgnoreEnd
 
         return $entityName;
     }
