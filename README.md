@@ -1,13 +1,13 @@
 # Laravel HAL Doctrine
 
-This project is a hydrator for [laravel-hal](https://github.com/API-Skeletons/laravel-hal)
-for Doctrine.  Instead of manually creating every hydrator for your entities, this hydrator
+This library provides a hydrator for [laravel-hal](https://github.com/API-Skeletons/laravel-hal)
+for Doctrine.  Instead of manually creating every hydrator for your entities, this library
 will introspect an entity and generate the HAL for it including links to 
-other collections for one to many relationships and embedding many to one and one to one
+other entities and collections for one to many relationships and embedding many to one and one to one
 entities.
 
-A grouped minimal configuration file will allow for excluded fields and associations and
-configure the routes for each entity.
+A grouped minimal configuration file allows for excluded fields and associations and
+configures the routes for each entity.
 
 
 ## Use
@@ -24,7 +24,8 @@ final class HydratorManager extends HALHydratorManager
     public function __construct() 
     {
         $this->classHydrators = [
-            \App\ORM\Entity\Artist::class => \ApiSkeletons\Laravel\HAL\Doctrine\DoctrineHydrator::class,
+            // This wildcard entry is used as an example and may not be exactly what you need
+            '*' => \ApiSkeletons\Laravel\HAL\Doctrine\DoctrineHydrator::class,
         ];
     }
 }
@@ -34,10 +35,9 @@ final class HydratorManager extends HALHydratorManager
 ```php
 use App\Hal\HydratorManager;
 
-public function fetch(Entity\Artist $artist)
+public function fetch(Entity\Artist $artist): array
 {
-    $hydratorManager = new HydratorManager();
-    return $hydratorManager->extract($artist);
+    return (new HydratorManager())->extract($artist)->toArray();
 }
 ```
 
@@ -47,7 +47,7 @@ will result in a HAL response like
   "_links": {
     "self": {
       "href": "https://website/artist/1"
-    }
+    },
     "album": {
       "href": "https://website/album?filter[artist]=1"
     }
@@ -60,6 +60,8 @@ will result in a HAL response like
 
 ## Configuration
 
+A `hal-doctrine.php` configuration file is required.
+
 ```php
 $config = [
     'default' => [
@@ -68,6 +70,7 @@ $config = [
             'entity' => 'api.{entityName}::fetch',
             'collection' => 'api.{entityName}::fetchAll',
         ],
+        // All entities configuration is optional
         'entities' => [
             \App\ORM\Entity\Artist::class => [
                 // Override route patterns
@@ -85,7 +88,67 @@ $config = [
 ];
 ```
 
-## Naming strategies
+### Doctrine\Laminas\Hydrator\DoctrineObject
 
-The naming strategy for turning an entity name into a HAL identifier is configurable and
-you can write your own naming strategy if desired.
+The Laminas Hydrator is used by this library to extract data directly from entities.  You must add this configuration
+to your `doctrine.php` configuration file:
+
+```php
+'custom_hydration_modes' = [
+    'hal-doctrine' => \Doctrine\Laminas\Hydrator\DoctrineObject::class,
+],
+```
+
+
+## Route naming
+
+When using the `routeNamePatterns` to create a route name, the entity name becomes `$inflector->urlize(shortName)`
+such as `api.short-name::fetch` according to the example configuration.
+
+
+## Filtering Collections
+
+For extracted related collections, links will be created with filter options compatible with
+`ApiSkeletons\Doctrine\QueryBuilder\Filter\Applicator` to filter the collection data to just the extracted entity.
+For example
+
+```json
+  "_links": {
+    ...
+    "album": {
+      "href": "https://website/album?filter[artist]=1"
+    }
+```
+
+The link to the Album will be filtered where `album.artist = 1`.  In order to process these URLs in your application, 
+implement `ApiSkeletons\Doctrine\QueryBuilder\Filter\Applicator` in your controller action:
+
+```php
+use ApiSkeletons\Doctrine\QueryBuilder\Filter\Applicator;
+
+public function fetchAll(EntityManager $entityManager): array
+{
+    $applicator = new Applicator($entityManager, Entity\Album::class);
+    $queryBuilder = $applicator($_REQUEST['filter']);
+    
+    return (new HydratorManager())
+        ->paginate('albums', collect($queryBuilder->getQuery()->getResult()))->toArray();
+}
+```
+
+See the [documentation for doctrine-querybuilder-filter](https://github.com/API-Skeletons/doctrine-querybuilder-filter#doctrine-querybuilder-filter)
+for more detailed examples.
+
+
+## Multiple Object Managers
+
+To configure a hydrator for other than the `default` configuration section, extend the Doctrine Hydrator
+```shell
+class SecondDoctrineHydrator extends ApiSkeletons\Laravel\HAL\Doctrine\DoctrineHydrator
+{
+    protected string $configurationSection = 'secondary';
+}
+```
+
+Then in your `hal-doctrine.php` configuration file, create a new section titled `secondary` and set the 
+`entityManager` to your second Entity Manager.
