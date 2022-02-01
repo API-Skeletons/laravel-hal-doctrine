@@ -4,16 +4,16 @@
     "type": "library",
     "require": {
         "php": "^8.0",
-        "laravel-doctrine/orm": "^1.6",
-        "api-skeletons/laravel-hal": "^4.0"
+        "laravel-doctrine/orm": "^1.7",
+        "api-skeletons/laravel-hal": "^5.0",
+        "doctrine/doctrine-laminas-hydrator": "^2.2"
     },
     "require-dev": {
         "doctrine/coding-standard": "^9.0",
-        "doctrine/dbal": "^3.1.1",
+        "doctrine/dbal": "^2.13.7||^3.1.1",
         "doctrine/annotations": "^1.13.2",
         "orchestra/testbench": "^6.23",
-        "phpunit/phpunit": "^9.5",
-        "vimeo/psalm": "^4.15"
+        "phpunit/phpunit": "^9.5"
     },
     "license": "MIT",
     "autoload": {

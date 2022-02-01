@@ -66,7 +66,7 @@ $config = [
         'entityManager' => EntityManager::class,
         'routePatterns' => [
             'entity' => 'api.{name}::fetch',
-            'collection => 'api.{name}::fetchAll',
+            'collection' => 'api.{name}::fetchAll',
         ],
         'entities' => [
             \App\ORM\Entity\Artist::class => [
