@@ -128,7 +128,7 @@ class DoctrineHydrator extends Hydrator
                 } else {
                     // For 1:1 relationships, only embed the owning side
                     $resource->addEmbeddedResource(
-                        $this->inflector->urlize($associationName),
+                        $associationName,
                         $data[$associationName]
                     );
                 }
