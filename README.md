@@ -65,8 +65,8 @@ $config = [
     'default' => [
         'entityManager' => EntityManager::class,
         'routeNamePatterns' => [
-            'entity' => 'api.{name}::fetch',
-            'collection' => 'api.{name}::fetchAll',
+            'entity' => 'api.{entityName}::fetch',
+            'collection' => 'api.{entityName}::fetchAll',
         ],
         'entities' => [
             \App\ORM\Entity\Artist::class => [
@@ -80,14 +80,6 @@ $config = [
                     'alias',
                 ],
             ],
-            /**
-             * Every entity which should be extracted, whether on
-             * its own or as a relationship, must be listed in the
-             * config even if its configuration is emtpy.  Entities 
-             * discovered in the metadata through relationships which
-             * are not in the configuration will be excluded.
-             */
-            \App\ORM\Entity\Album::class => [],
         ],
     ],
 ];
