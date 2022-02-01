@@ -15,6 +15,13 @@ abstract class TestCase extends OrchestraTestCase
     {
         parent::setUp();
 
+        Route::get('address', function() {
+            return true;
+        })->name('api.address::fetchAll');
+        Route::get('address/{id}', function() {
+            return true;
+        })->name('api.address::fetch');
+
         Route::get('artist', function() {
             return true;
         })->name('api.artist::fetchAll');
@@ -35,6 +42,13 @@ abstract class TestCase extends OrchestraTestCase
         Route::get('recording/{id}', function() {
             return true;
         })->name('api.recording::fetch');
+
+        Route::get('user', function() {
+            return true;
+        })->name('api.user::fetchAll');
+        Route::get('user/{id}', function() {
+            return true;
+        })->name('api.user::fetch');
 
     }
 

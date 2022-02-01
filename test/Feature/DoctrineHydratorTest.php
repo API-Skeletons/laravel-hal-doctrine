@@ -2,12 +2,12 @@
 
 namespace ApiSkeletonsTest\Laravel\Hal\Doctrine\Feature;
 
-use ApiSkeletons\Laravel\HAL\Resource;
 use ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity;
 use ApiSkeletonsTest\Laravel\HAL\Doctrine\HAL\HydratorManager;
 use ApiSkeletonsTest\Laravel\HAL\Doctrine\TestCase;
 use ApiSkeletonsTest\Laravel\HAL\Doctrine\Trait\PopulateData;
 use Doctrine\ORM\EntityManager;
+use Illuminate\Support\Arr;
 
 final class DoctrineHydratorTest extends TestCase
 {
@@ -32,7 +32,7 @@ final class DoctrineHydratorTest extends TestCase
         $this->assertEquals('Grateful Dead', $artist->getName());
     }
 
-    public function testTopEntityState(): void
+    public function testState(): void
     {
         $hydratorManager = new HydratorManager();
 
@@ -45,7 +45,7 @@ final class DoctrineHydratorTest extends TestCase
         $this->assertEquals('Grateful Dead', $hal['name']);
     }
 
-    public function testTopEntitySelfLink(): void
+    public function testSelfLink(): void
     {
         $artist = $this->entityManager->getRepository(Entity\Artist::class)
             ->find(1);
@@ -56,15 +56,82 @@ final class DoctrineHydratorTest extends TestCase
             ->find(2);
         $hal = $this->hydratorManager->extract($artist)->toArray();
         $this->assertEquals('http://localhost/artist/2', $hal['_links']['self']['href']);
+
+        $performance = $this->entityManager->getRepository(Entity\Performance::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($performance)->toArray();
+        $this->assertEquals('http://localhost/performance/1', $hal['_links']['self']['href']);
     }
 
-
-    public function testMidEntity(): void
+    public function testManyToOne(): void
     {
-        $artist = $this->entityManager->getRepository(Entity\Performance::class)
+        $performance = $this->entityManager->getRepository(Entity\Performance::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($performance)->toArray();
+
+        $hal = Arr::dot($hal);
+
+        $this->assertEquals('http://localhost/artist/1', $hal['_embedded.artist._links.self.href']);
+    }
+
+    public function testOneToMany(): void
+    {
+        $artist = $this->entityManager->getRepository(Entity\Artist::class)
             ->find(1);
         $hal = $this->hydratorManager->extract($artist)->toArray();
 
-        $this->assertEquals('http://localhost/performance/1', $hal['_links']['self']['href']);
+        $hal = Arr::dot($hal);
+
+        $this->assertEquals('http://localhost/performance?filter[artist]=1', urldecode($hal['_links.performances.href']));
+    }
+
+    public function testOneToOneOwningSide(): void
+    {
+        $user = $this->entityManager->getRepository(Entity\User::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($user)->toArray();
+
+        $hal = Arr::dot($hal);
+
+        $this->assertEquals('http://localhost/user/1', $hal['_links.self.href']);
+        $this->assertEquals('http://localhost/address/1', $hal['_embedded.address._links.self.href']);
+        $this->assertEquals('http://localhost/user/1', $hal['_embedded.address._links.user.href']);
+    }
+
+    public function testOneToOneInverseSide(): void
+    {
+        $address = $this->entityManager->getRepository(Entity\Address::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($address)->toArray();
+
+        $hal = Arr::dot($hal);
+
+        $this->assertEquals('http://localhost/address/1', $hal['_links.self.href']);
+        $this->assertEquals('http://localhost/user/1', $hal['_links.user.href']);
+    }
+
+    public function testManyToManyOwningSide(): void
+    {
+        $user = $this->entityManager->getRepository(Entity\User::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($user)->toArray();
+
+        $hal = Arr::dot($hal);
+
+        $this->assertEquals('http://localhost/user/1', $hal['_links.self.href']);
+        $this->assertEquals('http://localhost/recording?filter[users]=1', urldecode($hal['_links.recordings.href']));
+        $this->assertEquals('http://localhost/address/1', $hal['_embedded.address._links.self.href']);
+    }
+
+    public function testManyToManyInverseSide(): void
+    {
+        $user = $this->entityManager->getRepository(Entity\Recording::class)
+            ->find(1);
+        $hal = $this->hydratorManager->extract($user)->toArray();
+
+        $hal = Arr::dot($hal);
+
+        $this->assertEquals('http://localhost/recording/1', $hal['_links.self.href']);
+        $this->assertEquals('http://localhost/user?filter[recordings]=1', urldecode($hal['_links.users.href']));
     }
 }

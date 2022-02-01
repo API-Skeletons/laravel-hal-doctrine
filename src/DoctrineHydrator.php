@@ -19,7 +19,6 @@ use function array_diff_key;
 use function array_flip;
 use function count;
 use function in_array;
-use function print_r;
 use function route;
 use function str_replace;
 
@@ -100,31 +99,36 @@ class DoctrineHydrator extends Hydrator
             if ($entityMetadata->isCollectionValuedAssociation($associationName)) {
                 $associationMapping   = $entityMetadata->getAssociationMapping($associationName);
                 $associationRouteName = $this->getRouteName($associationMapping['targetEntity'], 'collection');
-                $resource->addLink(
-                    $this->inflector->urlize($associationName),
-                    route($associationRouteName, [
-                        'filter' => [$associationMapping['mappedBy'] => $identifier],
-                    ])
-                );
-            } else {
-                // For 1:1 relationships, only embed the owning side
-                // For the inverse side, include a link
+
                 if ($entityMetadata->isAssociationInverseSide($associationName)) {
-                    $associationMapping = $entityMetadata->getAssociationMapping($associationName);
-
-                    print_r($associationMapping);
-                    die('1:1 inverse side not finished');
-
-                    $associationRouteName = $this->getRouteName($associationMapping['targetEntity'], 'collection');
                     $resource->addLink(
-                        $this->inflector->urlize($associationName),
+                        $associationName,
                         route($associationRouteName, [
                             'filter' => [$associationMapping['mappedBy'] => $identifier],
                         ])
                     );
                 } else {
+                    $resource->addLink(
+                        $associationName,
+                        route($associationRouteName, [
+                            'filter' => [$associationMapping['inversedBy'] => $identifier],
+                        ])
+                    );
+                }
+            } else {
+                // For the inverse side of 1:1 relationships, include a link
+                if ($entityMetadata->isAssociationInverseSide($associationName)) {
+                    $associationMapping = $entityMetadata->getAssociationMapping($associationName);
+
+                    $associationRouteName = $this->getRouteName($associationMapping['targetEntity'], 'entity');
+                    $resource->addLink(
+                        $associationName,
+                        route($associationRouteName, $identifier)
+                    );
+                } else {
+                    // For 1:1 relationships, only embed the owning side
                     $resource->addEmbeddedResource(
-                        $this->inflector->urlize($associationName),
+                        $associationName,
                         $data[$associationName]
                     );
                 }

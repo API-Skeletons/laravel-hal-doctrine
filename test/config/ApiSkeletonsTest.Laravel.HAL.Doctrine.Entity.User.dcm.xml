@@ -6,6 +6,11 @@
     </id>
     <field name="name" type="string" nullable="false"/>
     <field name="email" type="string" nullable="false"/>
+    <one-to-one field="address" target-entity="ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Address" inversed-by="user">
+      <join-columns>
+        <join-column name="address_id" referenced-column-name="id" unique="true"/>
+      </join-columns>
+    </one-to-one>
     <many-to-many field="recordings" target-entity="ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Recording" inversed-by="users">
       <join-table name="RecordingToUser">
         <join-columns>

@@ -11,8 +11,11 @@ final class HydratorManager extends HALHydratorManager
     public function __construct()
     {
         $this->classHydrators = [
+            Entity\Address::class => DoctrineHydrator::class,
             Entity\Artist::class => DoctrineHydrator::class,
             Entity\Performance::class => DoctrineHydrator::class,
+            Entity\Recording::class => DoctrineHydrator::class,
+            Entity\User::class => DoctrineHydrator::class,
         ];
     }
 }
