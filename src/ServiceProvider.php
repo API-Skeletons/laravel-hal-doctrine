@@ -13,7 +13,6 @@ class ServiceProvider extends LaravelServiceProvider
      */
     public function register(): void
     {
-
 //        $this->app->singleton(ApiKeyService::class, static function ($app) {
 //            return new ApiKeyService();
 //        });
@@ -26,8 +25,7 @@ class ServiceProvider extends LaravelServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([
-            ]);
+            $this->commands([]);
         }
     }
 }
