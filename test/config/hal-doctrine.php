@@ -25,7 +25,7 @@ return [
                 ],
                 // List of fields and assocations to exclude
                 'exclude' => [
-                    'alias',
+                    'recordings',
                 ],
             ],
         ],

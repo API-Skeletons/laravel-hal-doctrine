@@ -60,7 +60,11 @@ will result in a HAL response like
 
 ## Configuration
 
-A `hal-doctrine.php` configuration file is required.
+A `hal-doctrine.php` configuration file is required.  Publish the included config to your project: 
+
+```sh
+php artisan vendor:publish --tag=config
+```
 
 ```php
 $config = [
@@ -143,7 +147,7 @@ for more detailed examples.
 ## Multiple Object Managers
 
 To configure a hydrator for other than the `default` configuration section, extend the Doctrine Hydrator
-```shell
+```php
 class SecondDoctrineHydrator extends ApiSkeletons\Laravel\HAL\Doctrine\DoctrineHydrator
 {
     protected string $configurationSection = 'secondary';
