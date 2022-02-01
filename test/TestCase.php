@@ -2,6 +2,7 @@
 
 namespace ApiSkeletonsTest\Laravel\HAL\Doctrine;
 
+use ApiSkeletons\Laravel\HAL\Doctrine\ServiceProvider;
 use Doctrine\Laminas\Hydrator\DoctrineObject;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -56,6 +57,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         return [
             DoctrineServiceProvider::class,
+            ServiceProvider::class,
         ];
     }
 
