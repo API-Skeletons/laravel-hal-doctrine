@@ -6,6 +6,8 @@ namespace ApiSkeletons\Laravel\HAL\Doctrine;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 
+use function config_path;
+
 class ServiceProvider extends LaravelServiceProvider
 {
     /**
