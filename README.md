@@ -1,8 +1,8 @@
 # Laravel HAL Doctrine
 
 This project is a hydrator for [laravel-hal](https://github.com/API-Skeletons/laravel-hal)
-for Doctrine.  Instead of manually creating every hydrator for your entities, this library
-will introspect an entity or collection and generate the HAL for it including links to 
+for Doctrine.  Instead of manually creating every hydrator for your entities, this hydrator
+will introspect an entity and generate the HAL for it including links to 
 other collections for one to many relationships and embedding many to one and one to one
 entities.
 
