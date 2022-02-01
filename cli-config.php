@@ -11,7 +11,7 @@ $config = Setup::createXMLMetadataConfiguration(array(__DIR__ . "/test/config"),
 // database configuration parameters
 $conn = array(
     'driver' => 'pdo_sqlite',
-    'path' => __DIR__ . '/db.sqlite',
+    'dbname' => ':memory:',
 );
 
 // obtaining the entity manager

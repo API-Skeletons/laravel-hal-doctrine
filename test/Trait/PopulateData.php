@@ -87,6 +87,17 @@ trait PopulateData
             }
         }
 
+        $address = new Entity\Address();
+        $address->setAddress('123 Elm St.');
+
+        $user = new Entity\User();
+        $user->setName('Testing');
+        $user->setEmail('testing@test.net');
+        $user->setAddress($address);
+
+        $this->entityManager->persist($address);
+        $this->entityManager->persist($user);
+
         $this->entityManager->flush();
     }
 }

@@ -23,6 +23,11 @@ class User
     private $id;
 
     /**
+     * @var \ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Address
+     */
+    private $address;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     private $recordings;
@@ -91,6 +96,30 @@ class User
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set address.
+     *
+     * @param \ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Address|null $address
+     *
+     * @return User
+     */
+    public function setAddress(\ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Address $address = null)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address.
+     *
+     * @return \ApiSkeletonsTest\Laravel\HAL\Doctrine\Entity\Address|null
+     */
+    public function getAddress()
+    {
+        return $this->address;
     }
 
     /**
