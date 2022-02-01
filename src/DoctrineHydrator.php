@@ -17,7 +17,7 @@ use function array_flip;
 class DoctrineHydrator extends Hydrator
 {
     /** @var mixed[] */
-    protected array $config = [];
+    protected array $config                = [];
     protected string $configurationSection = 'default';
     protected EntityManager $entityManager;
 
