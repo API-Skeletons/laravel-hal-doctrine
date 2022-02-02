@@ -55,7 +55,7 @@ will result in a HAL response like
     "self": {
       "href": "https://website/artist/1"
     },
-    "album": {
+    "albums": {
       "href": "https://website/album?filter[artist]=1"
     }
   },
