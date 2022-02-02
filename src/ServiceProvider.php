@@ -23,8 +23,12 @@ class ServiceProvider extends LaravelServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../config/hal-doctrine.php'
-                => config_path('hal-doctrine.php'),
-        ]);
+            $this->getConfigPath() => config_path('hal-doctrine.php'),
+        ], 'config');
+    }
+
+    protected function getConfigPath(): string
+    {
+        return __DIR__ . '/../config/hal-doctrine.php';
     }
 }
