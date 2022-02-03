@@ -3,6 +3,7 @@
 return [
     'default' => [
         'entityManager' => \Doctrine\ORM\EntityManager::class,
+        'namingStrategy' => \ApiSkeletons\Laravel\HAL\Doctrine\NamingStrategy\DefaultNamingStrategy::class,
         'routeNamePatterns' => [
             'entity' => 'api.{entityName}::fetch',
             'collection' => 'api.{entityName}::fetchAll',

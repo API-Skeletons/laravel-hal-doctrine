@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace ApiSkeletons\Laravel\HAL\Doctrine;
 
+use ApiSkeletons\Laravel\HAL\Doctrine\NamingStrategy\NamingStrategyInterface;
 use ApiSkeletons\Laravel\HAL\Hydrator;
 use ApiSkeletons\Laravel\HAL\Resource;
 use DateTime;
-use Doctrine\Inflector\Inflector;
-use Doctrine\Inflector\InflectorFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
 use Exception;
 use Illuminate\Foundation\Application;
-use ReflectionClass;
 
 use function array_diff_key;
 use function array_flip;
@@ -28,7 +26,7 @@ class DoctrineHydrator extends Hydrator
     protected array $config                = [];
     protected string $configurationSection = 'default';
     protected EntityManager $entityManager;
-    protected Inflector $inflector;
+    protected NamingStrategyInterface $namingStrategy;
 
     public function __construct(Application $application)
     {
@@ -50,8 +48,8 @@ class DoctrineHydrator extends Hydrator
 
         // @codeCoverageIgnoreEnd
 
-        $this->entityManager = $application->get($this->config['entityManager']);
-        $this->inflector     = InflectorFactory::create()->build();
+        $this->entityManager  = $application->get($this->config['entityManager']);
+        $this->namingStrategy = $application->get($this->config['namingStrategy']);
     }
 
     public function extract(mixed $entity): Resource
@@ -108,14 +106,14 @@ class DoctrineHydrator extends Hydrator
 
                 if ($entityMetadata->isAssociationInverseSide($associationName)) {
                     $resource->addLink(
-                        $associationName,
+                        $this->namingStrategy->association($associationName),
                         route($associationRouteName, [
                             'filter' => [$associationMapping['mappedBy'] => $identifier],
                         ])
                     );
                 } else {
                     $resource->addLink(
-                        $associationName,
+                        $this->namingStrategy->association($associationName),
                         route($associationRouteName, [
                             'filter' => [$associationMapping['inversedBy'] => $identifier],
                         ])
@@ -128,13 +126,13 @@ class DoctrineHydrator extends Hydrator
 
                     $associationRouteName = $this->getRouteName($associationMapping['targetEntity'], 'entity');
                     $resource->addLink(
-                        $associationName,
+                        $this->namingStrategy->association($associationName),
                         route($associationRouteName, $identifier)
                     );
                 } else {
                     // For 1:1 relationships, only embed the owning side
                     $resource->addEmbeddedResource(
-                        $associationName,
+                        $this->namingStrategy->association($associationName),
                         $data[$associationName]
                     );
                 }
@@ -149,7 +147,7 @@ class DoctrineHydrator extends Hydrator
         return $this->config['entities'][$entityName]['routeNames'][$routeType] ??
             str_replace(
                 '{entityName}',
-                $this->inflector->urlize((new ReflectionClass($entityName))->getShortName()),
+                $this->namingStrategy->route($entityName),
                 $this->config['routeNamePatterns'][$routeType]
             );
     }

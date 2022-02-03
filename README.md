@@ -111,9 +111,16 @@ to your `doctrine.php` configuration file:
 ```
 
 
+### Naming Strategy
+
+The default naming strategy uses the Inflector's `urlize()` method to change 'associationName' into 'association-name'.
+If this is not the way you want to name your relationsihps or routes then create your own naming strategy and assign
+it in the config file.
+
+
 ## Route naming
 
-When using the `routeNamePatterns` to create a route name, the entity name becomes `$inflector->urlize(shortName)`
+When using the `routeNamePatterns` to create a route name, the entity name becomes `$namingStrategy->route($entityName)`
 such as `api.short-name::fetch` according to the example configuration.
 
 
